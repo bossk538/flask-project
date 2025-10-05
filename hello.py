@@ -1,16 +1,28 @@
-# hello.py
-
 from flask import Flask
 from flask import request
-from markupsafe import escape
+from pymongo import MongoClient
 
 app = Flask(__name__)
 
-@app.route("/")
-def hello_world():
-    return "Hello, World!"
+uri = "mongodb+srv://jamesg:xotalanc825@cluster0.xjm0dm7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+client = MongoClient(uri)
 
-@app.route("/hello")
+
+@app.route('/')
 def hello():
-    name = request.args.get("name", "Flask")
-    return f"Hello, {escape(name)}!"
+    return 'Hello, World!'
+
+@app.route('/chuck')
+def chuck():
+    name = request.args.get("name", "Chuck")
+
+    database = client.get_database("sample_mflix")
+    movies = database.get_collection("movies")
+    # Query for a movie that has the title 'Back to the Future'
+    query = { "title": "Back to the Future" }
+    movie = movies.find_one(query)
+    client.close()
+
+    return f'Hello, {name}, {movie}!'
+ 
+
