@@ -1,10 +1,13 @@
 from flask import Flask
 from flask import request
 from pymongo import MongoClient
+from dotenv import dotenv_values
 
 app = Flask(__name__)
 
-uri = "mongodb+srv://jamesg:xotalanc825@cluster0.xjm0dm7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+config = dotenv_values()
+
+uri = f"mongodb+srv://jamesg:{config['MONGO_PWD']}@cluster0.xjm0dm7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(uri)
 
 
