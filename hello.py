@@ -37,20 +37,20 @@ def chuck():
 
 @app.route('/post', methods=["POST"])
 def postit():
-    #data = {
-    #        'chuck': 'walla',
-    #        'foo': 'gila monster'
-    #        }
     data = request.get_json()
     return jsonify(data)
 
 @app.route('/getBestScore')
 def getBestScore():
-    return jsonify(666)
+    result = client.myDB.scores.find_one({ 'name': 'James' })
+    return result['bestScore']
 
 @app.route('/setBestScore')
 def setBestScore():
     bestScore = request.args.get("bestScore", 0)
+    result = client.myDB.scores.update_one({'name':'James'}, { '$set': {'name': 'James', 'bestScore': bestScore } }, upsert=True)
+    print(result)
+    return jsonify({ 'matched_count': result.matched_count, 'modified_count': result.modified_count })
 
 @app.route('/getGameState')
 def getGameState():
@@ -113,17 +113,15 @@ def getGameState():
 @app.route('/setGameState', methods=["POST"])
 def setGameState():
     game_state = request.json
-    database = client.get_database("myDB")
-    movies = database.get_collection("myCollection")
     raw_doc = {
         "name":"James",
         "game_state":game_state
     }
-    movie = movies.insert_one(raw_doc)
+    movie = client.myDB.games.insert_one(raw_doc)
     return str(movie.inserted_id)
 
 @app.route('/clearGameState')
 def clearGameState():
-    res = client.myDB.myCollection.delete_many({ "name": "James" })
+    res = client.myDB.games.delete_many({ "name": "James" })
     return str(res.deleted_count)
 
