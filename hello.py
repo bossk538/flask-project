@@ -113,10 +113,17 @@ def getGameState():
 @app.route('/setGameState', methods=["POST"])
 def setGameState():
     game_state = request.json
-    return jsonify({"game_state":"foopa"});
-    # Content-Type was not 'application/json'.
+    database = client.get_database("myDB")
+    movies = database.get_collection("myCollection")
+    raw_doc = {
+        "name":"James",
+        "game_state":game_state
+    }
+    movie = movies.insert_one(raw_doc)
+    return str(movie.inserted_id)
 
 @app.route('/clearGameState')
 def clearGameState():
-    return 'foo';
+    res = client.myDB.myCollection.delete_many({ "name": "James" })
+    return str(res.deleted_count)
 
